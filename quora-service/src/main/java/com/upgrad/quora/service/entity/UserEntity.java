@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -28,7 +30,16 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 // contactNumber VARCHAR(30),
 // PRIMARY KEY (id));
 @Entity
-@Table(name = "users")
+@Table(name = "users",schema = "public")
+@NamedQueries(
+    {
+        @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid = :uuid"),
+        @NamedQuery(name = "userByUserName", query = "select u from UserEntity u where u"
+            + ".userName = :userName"),
+        @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u"
+            + ".email =:email")
+    }
+)
 public class UserEntity {
 
   @Id
@@ -41,17 +52,17 @@ public class UserEntity {
   @Size(max = 200)
   private String uuid;
 
-  @Column(name = "firstName")
+  @Column(name = "firstname")
   @NotNull
   @Size(max = 30)
   private String firstName;
 
-  @Column(name = "lastName")
+  @Column(name = "lastname")
   @NotNull
   @Size(max = 30)
   private String lastName;
 
-  @Column(name = "userName", unique = true)
+  @Column(name = "username", unique = true)
   @NotNull
   @Size(max = 30)
   private String userName;
@@ -76,7 +87,7 @@ public class UserEntity {
   @Size(max = 30)
   private String country;
 
-  @Column(name = "aboutMe")
+  @Column(name = "aboutme")
   @Size(max = 50)
   private String aboutMe;
 
@@ -88,7 +99,7 @@ public class UserEntity {
   @Size(max = 30)
   private String role;
 
-  @Column(name = "contactNumber")
+  @Column(name = "contactnumber")
   @Size(max = 30)
   private String contactNumber;
 
