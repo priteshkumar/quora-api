@@ -18,7 +18,7 @@ public class UserDao {
     return userEntity;
   }
 
-  public void deleteUser(UserEntity userEntity){
+  public void deleteUser(UserEntity userEntity) {
     entityManager.remove(userEntity);
   }
 
@@ -43,5 +43,18 @@ public class UserDao {
   public UserAuthEntity createUserAuth(UserAuthEntity userAuthEntity) {
     entityManager.persist(userAuthEntity);
     return userAuthEntity;
+  }
+
+  public UserAuthEntity getUserAuth(String accessToken) {
+    try {
+      return entityManager.createNamedQuery("userAuthTokenByAccessToken", UserAuthEntity.class)
+          .setParameter("accessToken", accessToken).getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
+  }
+
+  public void updateUserAuth(UserAuthEntity userAuthEntity) {
+    entityManager.merge(userAuthEntity);
   }
 }

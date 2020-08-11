@@ -1,6 +1,7 @@
 package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.SigninResponse;
+import com.upgrad.quora.api.model.SignoutResponse;
 import com.upgrad.quora.api.model.SignupUserRequest;
 import com.upgrad.quora.api.model.SignupUserResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
@@ -8,6 +9,7 @@ import com.upgrad.quora.service.business.SignupBusinessService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import java.util.Base64;
 import java.util.UUID;
@@ -84,5 +86,28 @@ public class UserController {
     httpHeaders.add("access-token", userAuthEntity.getAccessToken());
     return new ResponseEntity<>(signinResponse, httpHeaders, HttpStatus.OK);
 
+  }
+
+  @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces =
+      MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<SignoutResponse> signout(
+      @RequestHeader("authorization") String authorization)
+      throws AuthenticationFailedException, SignOutRestrictedException {
+
+    //authorization string may contain "Bearer " as prefix
+    //handle this case
+    String[] authData = authorization.split("Bearer ");
+    String accessToken = null;
+    if (authorization.startsWith("Bearer ") == true) {
+      accessToken = authData[1];
+    } else {
+      accessToken = authData[0];
+    }
+    UserEntity userEntity = authenticationService.signout(accessToken);
+    SignoutResponse signoutResponse = new SignoutResponse().id(userEntity.getUuid())
+        .message("SIGNED OUT "
+            + "SUCCESSFULLY");
+
+    return new ResponseEntity<>(signoutResponse, HttpStatus.OK);
   }
 }
