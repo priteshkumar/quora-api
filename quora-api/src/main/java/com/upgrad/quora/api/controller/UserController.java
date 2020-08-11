@@ -7,6 +7,7 @@ import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.SignupBusinessService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
+import com.upgrad.quora.service.exception.AuthenticationFailedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import java.util.Base64;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class UserController {
 
   @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SigninResponse> signin(
-      @RequestHeader("authorization") String authorization) {
+      @RequestHeader("authorization") String authorization) throws AuthenticationFailedException {
     String[] authData = authorization.split("Basic ");
     System.out.println(authData[1]);
     String[] loginDetails = new String(Base64.getDecoder().decode(authData[1])).split(":");

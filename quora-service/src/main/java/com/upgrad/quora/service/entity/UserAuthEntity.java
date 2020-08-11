@@ -16,6 +16,8 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /*
 CREATE TABLE IF NOT EXISTS USER_AUTH(
@@ -34,7 +36,7 @@ CREATE TABLE IF NOT EXISTS USER_AUTH(
 @Entity
 @Table(name = "user_auth",schema = "public")
 @NamedQueries({
-    @NamedQuery(name = "userAuthTokenByAccessToken" , query = "select ut from UserAuthTokenEntity ut where ut.accessToken = :accessToken ")
+    @NamedQuery(name = "userAuthTokenByAccessToken" , query = "select ut from UserAuthEntity ut where ut.accessToken = :accessToken ")
 })
 public class UserAuthEntity {
 
@@ -50,6 +52,7 @@ public class UserAuthEntity {
 
   @ManyToOne
   @JoinColumn(name = "USER_ID")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private UserEntity user;
 
   @Column(name = "ACCESS_TOKEN")
@@ -66,7 +69,6 @@ public class UserAuthEntity {
   private ZonedDateTime loginAt;
 
   @Column(name = "LOGOUT_AT")
-  @NotNull
   private ZonedDateTime logoutAt;
 
   public long getId() {
