@@ -1,11 +1,14 @@
 package com.upgrad.quora.api.controller;
 
+import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.QuestionService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,5 +46,27 @@ public class QuestionController {
     questionResponse.setId(createdQuestion.getUuid());
     questionResponse.setStatus("QUESTION CREATED");
     return new ResponseEntity<>(questionResponse, HttpStatus.CREATED);
+  }
+
+  @RequestMapping(method = RequestMethod.GET, path = "/question/all",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(
+      @RequestHeader("authorization") String authorization) throws AuthorizationFailedException {
+    String[] authData = authorization.split("Bearer ");
+    String accessToken = null;
+    if (authorization.startsWith("Bearer ") == true) {
+      accessToken = authData[1];
+    } else {
+      accessToken = authData[0];
+    }
+    List<QuestionEntity> qList = questionService.getAllQuestions(accessToken);
+    List<QuestionDetailsResponse> qDetailsList = new ArrayList<>();
+    qList.forEach((q) -> {
+      QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse();
+      questionDetailsResponse.id(q.getUuid());
+      questionDetailsResponse.content(q.getContent());
+      qDetailsList.add(questionDetailsResponse);
+    });
+    return new ResponseEntity<List<QuestionDetailsResponse>>(qDetailsList, HttpStatus.OK);
   }
 }

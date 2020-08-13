@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +28,13 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "question", schema = "public")
+@NamedQueries(
+    {
+        @NamedQuery(name = "questionByUuid", query = "select q from QuestionEntity q where q.uuid "
+            + "= :uuid"),
+        @NamedQuery(name = "allQuestions", query = "select q from QuestionEntity q")
+    }
+)
 public class QuestionEntity {
 
   @Id
