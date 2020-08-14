@@ -2,6 +2,8 @@ package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.QuestionDeleteResponse;
 import com.upgrad.quora.api.model.QuestionDetailsResponse;
+import com.upgrad.quora.api.model.QuestionEditRequest;
+import com.upgrad.quora.api.model.QuestionEditResponse;
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.QuestionService;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+//encodedData = "Basic " + window.btoa('rusty:test')
 
 @RestController
 public class QuestionController {
@@ -98,7 +102,7 @@ public class QuestionController {
       throws AuthorizationFailedException, UserNotFoundException {
     String accessToken = AuthTokenParser.parseAuthToken(authorization);
     List<QuestionEntity> qList = questionService.getAllQuestionsByUser(accessToken, userId);
-    List<QuestionDetailsResponse>  qDetailsList = new ArrayList<>();
+    List<QuestionDetailsResponse> qDetailsList = new ArrayList<>();
     qList.forEach((q) -> {
       QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse();
       questionDetailsResponse.content(q.getContent());
@@ -106,5 +110,22 @@ public class QuestionController {
       qDetailsList.add(questionDetailsResponse);
     });
     return new ResponseEntity<>(qDetailsList, HttpStatus.OK);
+  }
+
+  //editQuestionContent - "/question/edit/{questionId}"
+  //to do later
+  @RequestMapping(method = RequestMethod.PUT, path = "/question/edit/{questionId}",
+      consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<QuestionEditResponse> editQuestionContent(
+      @PathVariable("questionId") String questionId, final QuestionEditRequest questionEditRequest,
+      @RequestHeader("authorization") String authorization)
+      throws AuthorizationFailedException, InvalidQuestionException {
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
+    String content = questionEditRequest.getContent();
+    QuestionEntity updatedQuestion = questionService.updateQuestion(accessToken, questionId, content);
+    QuestionEditResponse questionEditResponse = new QuestionEditResponse();
+    questionEditResponse.setId(updatedQuestion.getUuid());
+    questionEditResponse.setStatus("QUESTION EDITED");
+    return new ResponseEntity<>(questionEditResponse, HttpStatus.OK);
   }
 }
