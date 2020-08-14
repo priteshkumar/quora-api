@@ -91,4 +91,26 @@ public class QuestionService {
     }
     return questionDao.getAllQuestionsByUser(userEntity.getId());
   }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public QuestionEntity updateQuestion(String accessToken, String questionId, String content)
+      throws AuthorizationFailedException, InvalidQuestionException {
+    UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
+    if (userAuth == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    } else if (userAuth.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to edit"
+          + " the question");
+    }
+    QuestionEntity question = questionDao.getQuestionByUUID(questionId);
+    if (question == null) {
+      throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+    }
+    if (!question.getUser().getUserName().equals(userAuth.getUser().getUserName())) {
+      throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the "
+          + "question");
+    }
+    question.setContent(content);
+    return questionDao.updateQuestion(question);
+  }
 }
