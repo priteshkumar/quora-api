@@ -7,6 +7,7 @@ import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,5 +73,22 @@ public class QuestionService {
     }
     QuestionEntity deletedQuestion = questionDao.deleteQuestion(question);
     return deletedQuestion;
+  }
+
+  public List<QuestionEntity> getAllQuestionsByUser(String accessToken, String userId)
+      throws AuthorizationFailedException, UserNotFoundException {
+    UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
+    if (userAuth == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    } else if (userAuth.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get "
+          + "all questions posted by a specific user");
+    }
+    UserEntity userEntity = userDao.getUserByUUID(userId);
+    if (userEntity == null) {
+      throw new UserNotFoundException("USR-001", "User with entered uuid whose question details "
+          + "are to be seen does not exist");
+    }
+    return questionDao.getAllQuestionsByUser(userEntity.getId());
   }
 }
