@@ -1,11 +1,14 @@
 package com.upgrad.quora.api.controller;
 
+import com.upgrad.quora.api.model.QuestionDeleteResponse;
 import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.QuestionService;
+import com.upgrad.quora.service.common.AuthTokenParser;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -68,5 +72,19 @@ public class QuestionController {
       qDetailsList.add(questionDetailsResponse);
     });
     return new ResponseEntity<List<QuestionDetailsResponse>>(qDetailsList, HttpStatus.OK);
+  }
+
+
+  @RequestMapping(method = RequestMethod.DELETE, path = "/question/delete/{questionId}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<QuestionDeleteResponse> deleteQuestion(
+      @PathVariable("questionId") String questionId,
+      @RequestHeader("authorization") String authorization)
+      throws AuthorizationFailedException, InvalidQuestionException {
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
+    QuestionEntity deletedQuestion = questionService.deleteQuestion(accessToken, questionId);
+    QuestionDeleteResponse questionDeleteResponse =
+        new QuestionDeleteResponse().id(deletedQuestion.getUuid()).status("QUESTION DELETED");
+    return new ResponseEntity<>(questionDeleteResponse,HttpStatus.OK);
   }
 }

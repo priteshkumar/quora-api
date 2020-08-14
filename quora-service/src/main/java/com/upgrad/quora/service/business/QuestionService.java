@@ -4,7 +4,9 @@ import com.upgrad.quora.service.dao.QuestionDao;
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,5 +47,30 @@ public class QuestionService {
           + " all questions");
     }
     return questionDao.getAllQuestions();
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public QuestionEntity deleteQuestion(String accessToken, String uuid)
+      throws AuthorizationFailedException, InvalidQuestionException {
+    UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
+    if (userAuth == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    } else if (userAuth.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to "
+          + "delete a question");
+    }
+
+    QuestionEntity question = questionDao.getQuestionByUUID(uuid);
+    if (question == null) {
+      throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+    }
+    UserEntity authUser = userAuth.getUser();
+    if (authUser.getRole().equals("nonadmin") && !authUser.getUserName()
+        .equals(question.getUser().getUserName())) {
+      throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can "
+          + "delete the question");
+    }
+    QuestionEntity deletedQuestion = questionDao.deleteQuestion(question);
+    return deletedQuestion;
   }
 }
