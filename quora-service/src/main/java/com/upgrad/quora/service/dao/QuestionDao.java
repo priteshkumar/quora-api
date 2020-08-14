@@ -22,6 +22,11 @@ public class QuestionDao {
     return entityManager.createNamedQuery("allQuestions", QuestionEntity.class).getResultList();
   }
 
+  public List<QuestionEntity> getAllQuestionsByUser(long userId) {
+    return entityManager.createNamedQuery("allQuestionsByUser", QuestionEntity.class)
+        .setParameter("user_id", userId).getResultList();
+  }
+
   public QuestionEntity getQuestionByUUID(String uuid) {
     try {
       return entityManager.createNamedQuery("questionByUuid", QuestionEntity.class).setParameter(

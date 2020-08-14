@@ -9,6 +9,7 @@ import com.upgrad.quora.service.common.AuthTokenParser;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,25 @@ public class QuestionController {
     QuestionEntity deletedQuestion = questionService.deleteQuestion(accessToken, questionId);
     QuestionDeleteResponse questionDeleteResponse =
         new QuestionDeleteResponse().id(deletedQuestion.getUuid()).status("QUESTION DELETED");
-    return new ResponseEntity<>(questionDeleteResponse,HttpStatus.OK);
+    return new ResponseEntity<>(questionDeleteResponse, HttpStatus.OK);
+  }
+
+
+  @RequestMapping(method = RequestMethod.GET, path = "/question/all/{userId}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(
+      @PathVariable("userId") String userId,
+      @RequestHeader("authorization") String authorization)
+      throws AuthorizationFailedException, UserNotFoundException {
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
+    List<QuestionEntity> qList = questionService.getAllQuestionsByUser(accessToken, userId);
+    List<QuestionDetailsResponse>  qDetailsList = new ArrayList<>();
+    qList.forEach((q) -> {
+      QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse();
+      questionDetailsResponse.content(q.getContent());
+      questionDetailsResponse.id(q.getUuid());
+      qDetailsList.add(questionDetailsResponse);
+    });
+    return new ResponseEntity<>(qDetailsList, HttpStatus.OK);
   }
 }
