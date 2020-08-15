@@ -1,6 +1,7 @@
 package com.upgrad.quora.api.exception;
 
 import com.upgrad.quora.api.model.ErrorResponse;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
@@ -62,6 +63,14 @@ public class QuoraExceptionHandler {
 
   @ExceptionHandler(InvalidQuestionException.class)
   public ResponseEntity<ErrorResponse> invalidQuestionException(InvalidQuestionException exe,
+      WebRequest request) {
+    return new ResponseEntity<ErrorResponse>(
+        new ErrorResponse().code(exe.getCode()).message(exe.getErrorMessage()), HttpStatus.NOT_FOUND
+    );
+  }
+
+  @ExceptionHandler(AnswerNotFoundException.class)
+  public ResponseEntity<ErrorResponse> answerNotFoundException(AnswerNotFoundException exe,
       WebRequest request) {
     return new ResponseEntity<ErrorResponse>(
         new ErrorResponse().code(exe.getCode()).message(exe.getErrorMessage()), HttpStatus.NOT_FOUND
