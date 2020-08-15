@@ -1,10 +1,12 @@
 package com.upgrad.quora.api.controller;
 
+import com.upgrad.quora.api.model.AnswerDeleteResponse;
 import com.upgrad.quora.api.model.AnswerRequest;
 import com.upgrad.quora.api.model.AnswerResponse;
 import com.upgrad.quora.service.business.AnswerService;
 import com.upgrad.quora.service.common.AuthTokenParser;
 import com.upgrad.quora.service.entity.AnswerEntity;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +38,20 @@ public class AnswerController {
     answerResponse.setId(createdAnswer.getUuid());
     answerResponse.setStatus("ANSWER CREATED");
     return new ResponseEntity<>(answerResponse, HttpStatus.CREATED);
+  }
+
+  //deleteAnswer - "/answer/delete/{answerId}"
+  @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<AnswerDeleteResponse> deleteAnswer(
+      @PathVariable("answerId") String answerId,
+      @RequestHeader("authorization") String authorization)
+      throws AuthorizationFailedException, AnswerNotFoundException {
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
+    AnswerEntity deletedAnswer = answerService.deleteAnswer(accessToken, answerId);
+    AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse();
+    answerDeleteResponse.setId(deletedAnswer.getUuid());
+    answerDeleteResponse.setStatus("ANSWER DELETED");
+    return new ResponseEntity<>(answerDeleteResponse, HttpStatus.OK);
   }
 }

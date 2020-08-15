@@ -6,6 +6,7 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import java.time.ZonedDateTime;
@@ -46,5 +47,29 @@ public class AnswerService {
     answerEntity.setPostedDate(ZonedDateTime.now());
     answerEntity.setUser(userAuthEntity.getUser());
     return answerDao.createAnswer(answerEntity);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public AnswerEntity deleteAnswer(String accessToken, String answerId)
+      throws AuthorizationFailedException, AnswerNotFoundException {
+    UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
+    if (userAuth == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    } else if (userAuth.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to "
+          + "delete an answer");
+    }
+    AnswerEntity answer = answerDao.getAnswerByUUID(answerId);
+    if (answer == null) {
+      throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
+    }
+    if (!userAuth.getUser().getRole().equals("admin") && !answer.getUser().getUserName()
+        .equals(userAuth.getUser().getUserName())) {
+      throw new AuthorizationFailedException("ATHR-003",
+          "Only the answer owner or admin can delete "
+              + "the answer");
+    }
+    AnswerEntity deletedAnswer = answerDao.deleteAnswer(answer);
+    return deletedAnswer;
   }
 }
