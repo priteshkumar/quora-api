@@ -10,6 +10,7 @@ import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,5 +72,24 @@ public class AnswerService {
     }
     AnswerEntity deletedAnswer = answerDao.deleteAnswer(answer);
     return deletedAnswer;
+  }
+
+  public List<AnswerEntity> getAllAnswersToQuestion(String accessToken, String questionId)
+      throws AuthorizationFailedException, InvalidQuestionException {
+    UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
+    if (userAuth == null) {
+      throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+    } else if (userAuth.getLogoutAt() != null) {
+      throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get "
+          + "the answers");
+    }
+    //The question with entered uuid whose details are to be seen does not exist
+    QuestionEntity question = questionDao.getQuestionByUUID(questionId);
+    if (question == null) {
+      throw new InvalidQuestionException("QUES-001", "The question with entered uuid whose details "
+          + "are to be seen does not exist");
+    }
+    List<AnswerEntity> answerList = answerDao.getAllAnswersByQuestion(question.getId());
+    return answerList;
   }
 }
