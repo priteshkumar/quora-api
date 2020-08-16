@@ -70,22 +70,23 @@ public class UserController {
   @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SigninResponse> signin(
       @RequestHeader("authorization") String authorization) throws AuthenticationFailedException {
-    String[] authData = authorization.split("Basic ");
-    System.out.println(authData[1]);
-    String[] loginDetails = new String(Base64.getDecoder().decode(authData[1])).split(":");
+    String authData = null;
+    if (authorization.startsWith("Basic ")) {
+      authData = authorization.split("Basic ")[1];
+    } else {
+      authData = authorization;
+    }
 
+    String[] loginDetails = new String(Base64.getDecoder().decode(authData)).split(":");
     UserAuthEntity userAuthEntity = authenticationService.authenticate(loginDetails[0],
         loginDetails[1]);
-
     UserEntity userEntity = userAuthEntity.getUser();
     SigninResponse signinResponse = new SigninResponse().id(userEntity.getUuid())
         .message("SIGNED IN "
             + "SUCCESSFULLY");
-
     HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.add("access-token", userAuthEntity.getAccessToken());
     return new ResponseEntity<>(signinResponse, httpHeaders, HttpStatus.OK);
-
   }
 
   @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces =
