@@ -2,6 +2,8 @@ package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.AnswerDeleteResponse;
 import com.upgrad.quora.api.model.AnswerDetailsResponse;
+import com.upgrad.quora.api.model.AnswerEditRequest;
+import com.upgrad.quora.api.model.AnswerEditResponse;
 import com.upgrad.quora.api.model.AnswerRequest;
 import com.upgrad.quora.api.model.AnswerResponse;
 import com.upgrad.quora.service.business.AnswerService;
@@ -77,5 +79,23 @@ public class AnswerController {
       answerDetailsResponseList.add(answerDetailsResponse);
     });
     return new ResponseEntity<>(answerDetailsResponseList, HttpStatus.OK);
+  }
+
+
+  @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes =
+      MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<AnswerEditResponse> editAnswerContent(
+      @PathVariable("answerId") String answerId,
+      AnswerEditRequest answerEditRequest,
+      @RequestHeader("authorization") String authorization)
+      throws AuthorizationFailedException, AnswerNotFoundException {
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
+    String content = answerEditRequest.getContent();
+    AnswerEntity answerEntity = answerService.editAnswer(accessToken,content,answerId);
+    AnswerEditResponse answerEditResponse = new AnswerEditResponse();
+    answerEditResponse.setId(answerEntity.getUuid());
+    answerEditResponse.setStatus("ANSWER EDITED");
+    return new ResponseEntity<>(answerEditResponse,HttpStatus.OK);
   }
 }
