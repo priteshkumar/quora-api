@@ -18,9 +18,8 @@ import org.springframework.web.context.request.WebRequest;
 public class QuoraExceptionHandler {
 
   @ExceptionHandler(SignUpRestrictedException.class)
-  public ResponseEntity<ErrorResponse> resourceNotFoundException(SignUpRestrictedException exe,
+  public ResponseEntity<ErrorResponse> signupRestrictedException(SignUpRestrictedException exe,
       WebRequest request) {
-    System.out.println(request.getParameterMap());
     return new ResponseEntity<ErrorResponse>(
         new ErrorResponse().code(exe.getCode()).message(exe.getErrorMessage()), HttpStatus.CONFLICT
     );
@@ -54,7 +53,7 @@ public class QuoraExceptionHandler {
   }
 
   @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<ErrorResponse> authFailedException(UserNotFoundException exe,
+  public ResponseEntity<ErrorResponse> userNotFoundException(UserNotFoundException exe,
       WebRequest request) {
     return new ResponseEntity<ErrorResponse>(
         new ErrorResponse().code(exe.getCode()).message(exe.getErrorMessage()), HttpStatus.NOT_FOUND
