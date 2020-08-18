@@ -39,13 +39,7 @@ public class QuestionController {
   public ResponseEntity<QuestionResponse> createQuestion(
       @RequestHeader("authorization") String authorization,
       QuestionRequest questionRequest) throws AuthorizationFailedException {
-    String[] authData = authorization.split("Bearer ");
-    String accessToken = null;
-    if (authorization.startsWith("Bearer ") == true) {
-      accessToken = authData[1];
-    } else {
-      accessToken = authData[0];
-    }
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
     QuestionEntity question = new QuestionEntity();
     question.setUuid(String.valueOf(UUID.randomUUID()));
     question.setContent(questionRequest.getContent());
@@ -61,13 +55,7 @@ public class QuestionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(
       @RequestHeader("authorization") String authorization) throws AuthorizationFailedException {
-    String[] authData = authorization.split("Bearer ");
-    String accessToken = null;
-    if (authorization.startsWith("Bearer ") == true) {
-      accessToken = authData[1];
-    } else {
-      accessToken = authData[0];
-    }
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
     List<QuestionEntity> qList = questionService.getAllQuestions(accessToken);
     List<QuestionDetailsResponse> qDetailsList = new ArrayList<>();
     qList.forEach((q) -> {

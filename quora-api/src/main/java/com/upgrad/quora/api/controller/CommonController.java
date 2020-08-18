@@ -2,6 +2,7 @@ package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.UserDetailsResponse;
 import com.upgrad.quora.service.business.CommonService;
+import com.upgrad.quora.service.common.AuthTokenParser;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
@@ -26,17 +27,7 @@ public class CommonController {
   public ResponseEntity<UserDetailsResponse> getUserProfile(@PathVariable("userId") String userID,
       @RequestHeader("authorization") String authorization)
       throws AuthorizationFailedException, UserNotFoundException {
-
-    //authorization string may contain "Bearer " as prefix
-    //handle this case
-    String[] authData = authorization.split("Bearer ");
-    String accessToken = null;
-    if (authorization.startsWith("Bearer ") == true) {
-      accessToken = authData[1];
-    } else {
-      accessToken = authData[0];
-    }
-
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
     UserEntity userEntity = commonService.getUserProfile(userID, accessToken);
     UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
     userDetailsResponse.setFirstName(userEntity.getFirstName());

@@ -6,6 +6,7 @@ import com.upgrad.quora.api.model.SignupUserRequest;
 import com.upgrad.quora.api.model.SignupUserResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.SignupBusinessService;
+import com.upgrad.quora.service.common.AuthTokenParser;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
@@ -94,16 +95,7 @@ public class UserController {
   public ResponseEntity<SignoutResponse> signout(
       @RequestHeader("authorization") String authorization)
       throws AuthenticationFailedException, SignOutRestrictedException {
-
-    //authorization string may contain "Bearer " as prefix
-    //handle this case
-    String[] authData = authorization.split("Bearer ");
-    String accessToken = null;
-    if (authorization.startsWith("Bearer ") == true) {
-      accessToken = authData[1];
-    } else {
-      accessToken = authData[0];
-    }
+    String accessToken = AuthTokenParser.parseAuthToken(authorization);
     UserEntity userEntity = authenticationService.signout(accessToken);
     SignoutResponse signoutResponse = new SignoutResponse().id(userEntity.getUuid())
         .message("SIGNED OUT "
