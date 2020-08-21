@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * RestController bean
  * implements methods for user signup/signin/signout
  */
 @RestController
