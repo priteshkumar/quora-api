@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * service bean handling user creation/deletion
+ */
 @Service
 public class UserBusinessService {
 
@@ -20,6 +23,13 @@ public class UserBusinessService {
   @Autowired
   PasswordCryptographyProvider passwordCryptographyProvider;
 
+  /**
+   * creates user in db via dao layer
+   *
+   * @param userEntity
+   * @return
+   * @throws SignUpRestrictedException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity createUser(UserEntity userEntity) throws SignUpRestrictedException {
     if (userDao.getUserByUserName(userEntity.getUserName()) != null) {
@@ -40,6 +50,17 @@ public class UserBusinessService {
     return userDao.createUser(userEntity);
   }
 
+  /**
+   * deletes user in db via dao
+   * <p>
+   * Requires admin role privilege
+   *
+   * @param userId
+   * @param accessToken
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws UserNotFoundException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity deleteUser(String userId, String accessToken)
       throws AuthorizationFailedException, UserNotFoundException {

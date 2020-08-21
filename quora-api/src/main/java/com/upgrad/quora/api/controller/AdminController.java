@@ -22,6 +22,17 @@ public class AdminController {
   @Autowired
   UserBusinessService userBusinessService;
 
+  /**
+   * deletes a registered user from backend db
+   * <p>
+   * Admin role is required for delete api access
+   *
+   * @param userId
+   * @param authorization
+   * @return UserDeleteResponse with http status code 200
+   * @throws AuthorizationFailedException
+   * @throws UserNotFoundException
+   */
   @RequestMapping(method = RequestMethod.DELETE, path = "/admin/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDeleteResponse> deleteUser(@PathVariable("userId") String userId,
       @RequestHeader("authorization") String authorization)

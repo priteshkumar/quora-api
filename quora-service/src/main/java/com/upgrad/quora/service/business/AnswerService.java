@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service bean for handling answer endpoints
+ */
 @Service
 public class AnswerService {
 
@@ -29,6 +32,17 @@ public class AnswerService {
   @Autowired
   AnswerDao answerDao;
 
+  /**
+   * Posts answer for a question in api db
+   * Requires signed in user
+   *
+   * @param accessToken
+   * @param questionId
+   * @param answerEntity
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public AnswerEntity createAnswer(String accessToken, String questionId,
       AnswerEntity answerEntity) throws AuthorizationFailedException, InvalidQuestionException {
@@ -50,6 +64,16 @@ public class AnswerService {
     return answerDao.createAnswer(answerEntity);
   }
 
+  /**
+   * Deletes answer with given answerId in api db
+   * Only signed in admin/owner can do delete
+   *
+   * @param accessToken
+   * @param answerId
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws AnswerNotFoundException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public AnswerEntity deleteAnswer(String accessToken, String answerId)
       throws AuthorizationFailedException, AnswerNotFoundException {
@@ -74,6 +98,15 @@ public class AnswerService {
     return deletedAnswer;
   }
 
+  /**
+   * Gets all answers to a given question in api db
+   *
+   * @param accessToken
+   * @param questionId
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   public List<AnswerEntity> getAllAnswersToQuestion(String accessToken, String questionId)
       throws AuthorizationFailedException, InvalidQuestionException {
     UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
@@ -93,6 +126,17 @@ public class AnswerService {
     return answerList;
   }
 
+  /**
+   * Edits content for a given answer in api db
+   * Only signed in owner can edit
+   *
+   * @param accessToken
+   * @param content
+   * @param answerId
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws AnswerNotFoundException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public AnswerEntity editAnswer(String accessToken, String content, String answerId)
       throws AuthorizationFailedException, AnswerNotFoundException {

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * service bean for handling Question endpoint access
+ */
 @Service
 public class QuestionService {
 
@@ -23,6 +26,15 @@ public class QuestionService {
   @Autowired
   private QuestionDao questionDao;
 
+  /**
+   * Creates question in api db via QuestionDao
+   * Signed in users are allowed to create question
+   *
+   * @param accessToken
+   * @param question
+   * @return
+   * @throws AuthorizationFailedException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public QuestionEntity createQuestion(String accessToken, QuestionEntity question)
       throws AuthorizationFailedException {
@@ -38,6 +50,14 @@ public class QuestionService {
     return createdQuestion;
   }
 
+  /**
+   * Gets all questions from api db via question dao
+   * Signed in users are allowed to access this endpoint
+   *
+   * @param accessToken
+   * @return
+   * @throws AuthorizationFailedException
+   */
   public List<QuestionEntity> getAllQuestions(String accessToken)
       throws AuthorizationFailedException {
     UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
@@ -50,6 +70,16 @@ public class QuestionService {
     return questionDao.getAllQuestions();
   }
 
+  /**
+   * Deletes a specific question in api db via question dao
+   * Only signed in admin or owner of question can delete it
+   *
+   * @param accessToken
+   * @param uuid
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public QuestionEntity deleteQuestion(String accessToken, String uuid)
       throws AuthorizationFailedException, InvalidQuestionException {
@@ -75,6 +105,16 @@ public class QuestionService {
     return deletedQuestion;
   }
 
+  /**
+   * Gets all question by a specific user
+   * signed in users can access this endpoint
+   *
+   * @param accessToken
+   * @param userId
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws UserNotFoundException
+   */
   public List<QuestionEntity> getAllQuestionsByUser(String accessToken, String userId)
       throws AuthorizationFailedException, UserNotFoundException {
     UserAuthEntity userAuth = userDao.getUserAuth(accessToken);
@@ -92,6 +132,17 @@ public class QuestionService {
     return questionDao.getAllQuestionsByUser(userEntity.getId());
   }
 
+  /**
+   * Edits a specific question content in api db
+   * Needs signed in user/owner of the question
+   *
+   * @param accessToken
+   * @param questionId
+   * @param content
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public QuestionEntity updateQuestion(String accessToken, String questionId, String content)
       throws AuthorizationFailedException, InvalidQuestionException {

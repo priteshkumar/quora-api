@@ -8,12 +8,24 @@ import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service bean for handling userprofile endpoint
+ */
 @Service
 public class CommonService {
 
   @Autowired
   private UserDao userDao;
 
+  /**
+   * Gets userprofile for a registered user in api db
+   *
+   * @param userId
+   * @param accessToken
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws UserNotFoundException
+   */
   public UserEntity getUserProfile(String userId, String accessToken)
       throws AuthorizationFailedException, UserNotFoundException {
     UserAuthEntity userAuth = userDao.getUserAuth(accessToken);

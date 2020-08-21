@@ -22,6 +22,17 @@ public class CommonController {
   @Autowired
   CommonService commonService;
 
+  /**
+   * gets profile of a registered user
+   * <p>
+   * Requires bearer authorization via jwt token
+   *
+   * @param userID
+   * @param authorization
+   * @return UserDetailsResponse with HTTP code 200
+   * @throws AuthorizationFailedException
+   * @throws UserNotFoundException
+   */
   @RequestMapping(method = RequestMethod.GET, path = "/userprofile/{userId}", produces =
       MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDetailsResponse> getUserProfile(@PathVariable("userId") String userID,

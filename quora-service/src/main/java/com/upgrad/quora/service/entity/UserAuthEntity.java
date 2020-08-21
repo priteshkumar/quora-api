@@ -19,24 +19,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-/*
-CREATE TABLE IF NOT EXISTS USER_AUTH(
-    ID BIGSERIAL PRIMARY KEY,
-    uuid VARCHAR(200) NOT NULL,
-    USER_ID INTEGER NOT NULL,
-    ACCESS_TOKEN VARCHAR(500) NOT NULL,
-    EXPIRES_AT TIMESTAMP NOT NULL,
-    LOGIN_AT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    LOGOUT_AT TIMESTAMP NULL
-    );
-
-    ALTER TABLE USER_AUTH ADD CONSTRAINT FK_USER_AUTH_USER_ID FOREIGN KEY(USER_ID) REFERENCES
-    USERS(ID) ON DELETE CASCADE ;*/
 
 @Entity
-@Table(name = "user_auth",schema = "public")
+@Table(name = "user_auth", schema = "public")
 @NamedQueries({
-    @NamedQuery(name = "userAuthTokenByAccessToken" , query = "select ut from UserAuthEntity ut where ut.accessToken = :accessToken ")
+    @NamedQuery(name = "userAuthTokenByAccessToken", query = "select ut from UserAuthEntity ut where ut.accessToken = :accessToken ")
 })
 public class UserAuthEntity {
 

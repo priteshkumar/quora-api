@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service bean for handling user signin/signout endpoints
+ */
 @Service
 public class AuthenticationService {
 
@@ -21,6 +24,15 @@ public class AuthenticationService {
   @Autowired
   PasswordCryptographyProvider passwordCryptographyProvider;
 
+  /**
+   * Signs in user with api
+   * Requires valid username/password
+   *
+   * @param userName
+   * @param password
+   * @return
+   * @throws AuthenticationFailedException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserAuthEntity authenticate(String userName,String password)
       throws AuthenticationFailedException {
@@ -45,6 +57,14 @@ public class AuthenticationService {
     return createdUserAuth;
   }
 
+  /**
+   * Signs out user from api backend
+   * Requires valid JWT accessToken
+   *
+   * @param accessToken
+   * @return
+   * @throws SignOutRestrictedException
+   */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity signout(String accessToken) throws SignOutRestrictedException {
     UserAuthEntity userAuthEntity = userDao.getUserAuth(accessToken);

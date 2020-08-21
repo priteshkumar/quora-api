@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * implements methods for user signup/signin/signout
+ */
 @RestController
 public class UserController {
 
@@ -33,6 +36,13 @@ public class UserController {
   @Autowired
   AuthenticationService authenticationService;
 
+  /**
+   * signs up user in api/db sets up the user as nonadmin
+   *
+   * @param signupUserRequest
+   * @return SignupUserResponse with HTTP code 201
+   * @throws SignUpRestrictedException
+   */
   @RequestMapping(method = RequestMethod.POST, path = "/user/signup", consumes =
       MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest)
@@ -67,11 +77,18 @@ public class UserController {
     return new ResponseEntity<>(signupUserResponse, HttpStatus.CREATED);
   }
 
-
+  /**
+   * signs in the user with Basic authentication
+   *
+   * @param authorization
+   * @return SigninResponse with HTTP status code 200
+   * @throws AuthenticationFailedException
+   */
   @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SigninResponse> signin(
       @RequestHeader("authorization") String authorization) throws AuthenticationFailedException {
     String authData = null;
+
     if (authorization.startsWith("Basic ")) {
       authData = authorization.split("Basic ")[1];
     } else {
@@ -90,6 +107,14 @@ public class UserController {
     return new ResponseEntity<>(signinResponse, httpHeaders, HttpStatus.OK);
   }
 
+  /**
+   * logs out user of the api backend
+   *
+   * @param authorization
+   * @return SignoutResponse with HTTP code 200
+   * @throws AuthenticationFailedException
+   * @throws SignOutRestrictedException
+   */
   @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces =
       MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SignoutResponse> signout(

@@ -30,6 +30,18 @@ public class AnswerController {
   @Autowired
   AnswerService answerService;
 
+  /**
+   * Creates answer for a specific question in api db
+   * <p>
+   * Requires bearer authorization
+   *
+   * @param questionId
+   * @param answerRequest
+   * @param authorization
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create",
       consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AnswerResponse> createAnswer(@PathVariable("questionId") String questionId,
@@ -45,7 +57,17 @@ public class AnswerController {
     return new ResponseEntity<>(answerResponse, HttpStatus.CREATED);
   }
 
-
+  /**
+   * Deletes a specific answer in api db
+   * <p>
+   * Requires bearer authorization
+   *
+   * @param answerId
+   * @param authorization
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws AnswerNotFoundException
+   */
   @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AnswerDeleteResponse> deleteAnswer(
@@ -60,7 +82,17 @@ public class AnswerController {
     return new ResponseEntity<>(answerDeleteResponse, HttpStatus.OK);
   }
 
-
+  /**
+   * Retrieves all answers to a specific question
+   * <p>
+   * Requires Bearer authorization
+   *
+   * @param questionId
+   * @param authorization
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws InvalidQuestionException
+   */
   @RequestMapping(method = RequestMethod.GET, path = "/answer/all/{questionId}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersToQuestion(
@@ -81,7 +113,18 @@ public class AnswerController {
     return new ResponseEntity<>(answerDetailsResponseList, HttpStatus.OK);
   }
 
-
+  /**
+   * Edits a specific answer in api db
+   * <p>
+   * Requires bearer auth
+   *
+   * @param answerId
+   * @param answerEditRequest
+   * @param authorization
+   * @return
+   * @throws AuthorizationFailedException
+   * @throws AnswerNotFoundException
+   */
   @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes =
       MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,10 +135,10 @@ public class AnswerController {
       throws AuthorizationFailedException, AnswerNotFoundException {
     String accessToken = AuthTokenParser.parseAuthToken(authorization);
     String content = answerEditRequest.getContent();
-    AnswerEntity answerEntity = answerService.editAnswer(accessToken,content,answerId);
+    AnswerEntity answerEntity = answerService.editAnswer(accessToken, content, answerId);
     AnswerEditResponse answerEditResponse = new AnswerEditResponse();
     answerEditResponse.setId(answerEntity.getUuid());
     answerEditResponse.setStatus("ANSWER EDITED");
-    return new ResponseEntity<>(answerEditResponse,HttpStatus.OK);
+    return new ResponseEntity<>(answerEditResponse, HttpStatus.OK);
   }
 }

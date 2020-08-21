@@ -7,6 +7,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repository bean for Question entity
+ */
 @Repository
 public class QuestionDao {
 

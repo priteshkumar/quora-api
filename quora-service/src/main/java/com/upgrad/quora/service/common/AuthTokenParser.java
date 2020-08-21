@@ -2,6 +2,7 @@ package com.upgrad.quora.service.common;
 
 /**
  * utility class
+ * <p>
  * provides method to parse Bearer authorization in http request header
  */
 public class AuthTokenParser {

@@ -14,6 +14,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+
+/**
+ * Global exception handler
+ * <p>
+ * Implements handlers for needed api access exceptions/HTTP errors
+ * Below exceptions are handled:
+ * SignUpRestrictedException : HTTP 409
+ * AuthenticationFailedException : HTTP 401
+ * AuthorizationFailedException : HTTP 403
+ * SignOutRestrictedException : HTTP 401
+ * UserNotFoundException : HTTP 404
+ * InvalidQuestionException : HTTP 404
+ *
+ */
 @ControllerAdvice
 public class QuoraExceptionHandler {
 
